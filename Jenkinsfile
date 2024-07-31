@@ -8,11 +8,7 @@ pipeline {
     }
 
     stages {
-        stage('Clean Workspace') {
-            steps {
-                cleanWs()
-            }
-        }
+
 // no need , because define on configure 
 //        stage('Git Checkout SCM') {
 //            steps {
