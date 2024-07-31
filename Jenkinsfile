@@ -14,11 +14,56 @@ pipeline {
 //                checkout scm
 //            }
 //    }
+
+        stage('Cache Calculate Checksum if Installed Dependencies') {
+            steps {
+                script {
+                    CACHE_KEY = sh(
+                        script: 'md5sum package.json | awk \'{ print $1 }\'',
+                        returnStdout: true
+                    ).trim()
+                    echo "Calculated Checksum: ${CACHE_KEY}"
+
+                    def cacheHit = false
+                    if (fileExists("dependencies-${CACHE_KEY}.tar")) {
+                        echo "Cache hit, extracting dependencies..."
+                        sh "tar -xf dependencies-${CACHE_KEY}.tar"
+                        cacheHit = true
+                    }
+
+                    if (!cacheHit) {
+                        echo "Cache miss, running yarn install..."
+                        sh 'yarn install'
+                        sh "tar -cf dependencies-${CACHE_KEY}.tar node_modules"
+                    }
+                }
+            }
+        }
+
+        // stage('Install Dependencies') {
+        //     steps {
+        //         script {
+        //             def cacheHit = false
+        //             if (fileExists("dependencies-${CACHE_KEY}.tar")) {
+        //                 echo "Cache hit, extracting dependencies..."
+        //                 sh "tar -xf dependencies-${CACHE_KEY}.tar"
+        //                 cacheHit = true
+        //             }
+
+        //             if (!cacheHit) {
+        //                 echo "Cache miss, running yarn install..."
+        //                 sh 'yarn install'
+        //                 sh "tar -cf dependencies-${CACHE_KEY}.tar node_modules"
+        //             }
+        //         }
+        //     }
+        // }                
+
         stage('Unit Install and Build') {
             steps {
                 script {
                     // Install dependencies using Yarn
-                    sh 'yarn install'
+               //     sh 'yarn install'
                     sh 'yarn build'
                 }
             }
