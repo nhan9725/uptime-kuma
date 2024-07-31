@@ -1,44 +1,24 @@
 pipeline {
     agent any
-  
+
     environment {
-    SONARCLOUD = 'Sonarcloud'
+        SONARCLOUD = 'Sonarcloud'
+        SONAR_ORG = 'test-sonar' // Your Sonar organization
+        SONAR_PROJECT_KEY = 'test-3107' // Your Sonar project key
     }
+
     stages {
         stage('Clean Workspace') {
             steps {
                 cleanWs()
             }
         }
-
-        stage('Git Checkout SCM') {
-            steps {
-              checkout scm
-            }
-        }
-
-        stage('Compile and Run Sonar Analysis') {
-            steps {
-                script {
-                    withSonarQubeEnv(credentialsId: SONARCLOUD, installationName: 'Sonarcloud') {
-                        try {
-                            if (fileExists('package.json')) {
-                                sh "${sonarscanner} -Dsonar.organization=test-sonar -Dsonar.projectKey=test-3107 -Dsonar.sources=. -Dsonar.host.url=https://sonarcloud.io"
-                            } 
-                            else {
-                                currentBuild.result = 'FAILURE'
-                                pipelineError = true
-                                error("Unsupported application type: No compatible build steps available.")
-                            }
-                        } catch (Exception e) {
-                            currentBuild.result = 'FAILURE'
-                            pipelineError = true
-                            error("Error during Sonar analysis: ${e.message}")
-                        }
-                    }
-                }
-            }
-        }
+// no need , because define on configure 
+//        stage('Git Checkout SCM') {
+//            steps {
+//                checkout scm
+//            }
+//    }
 
         stage('Unit Test') {
             steps {
@@ -56,30 +36,24 @@ pipeline {
                     sh 'yarn build'
                 }
             }
-        }
+        }        
         
-        stage('Test') {
+        stage('Compile and Run Sonar Analysis') {
             steps {
                 script {
-                    def version = readFile('VERSION').trim() // Ensure VERSION file is read correctly
-                    echo "Testing version ${version}..."
-                    // Run tests with coverage
-                    sh 'yarn test --coverage'
-                }
-            }
-        }
-
-        stage('Code Coverage') {
-            steps {
-                script {
-                    // Record and publish code coverage reports using JaCoCo
-                    recordCoverage tools: [[parser: 'JACOCO']],
-                        id: 'jacoco', name: 'JaCoCo Coverage',
-                        sourceCodeRetention: 'EVERY_BUILD',
-                        qualityGates: [
-                            [threshold: 60.0, metric: 'LINE', baseline: 'PROJECT', unstable: true],
-                            [threshold: 60.0, metric: 'BRANCH', baseline: 'PROJECT', unstable: true]
-                        ]
+                    withSonarQubeEnv(credentialsId: SONARCLOUD, installationName: 'Sonarcloud') {
+                        try {
+                            if (fileExists('package.json')) {
+                                sh "${sonarscanner} -Dsonar.organization=${SONAR_ORG} -Dsonar.projectKey=${SONAR_PROJECT_KEY} -Dsonar.sources=. -Dsonar.host.url=https://sonarcloud.io"
+                            } else {
+                                currentBuild.result = 'FAILURE'
+                                error("Unsupported application type: No compatible build steps available.")
+                            }
+                        } catch (Exception e) {
+                            currentBuild.result = 'FAILURE'
+                            error("Error during Sonar analysis: ${e.message}")
+                        }
+                    }
                 }
             }
         }
@@ -87,6 +61,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
+                    def version = readFile('VERSION').trim() // Ensure VERSION file is read correctly
                     echo "Deploying version ${version}..."
                 }
             }
@@ -103,11 +78,18 @@ pipeline {
                 }
             }
         }
-    }    
+    }
+    
     post {
         always {
             junit 'reports/**/*.xml' // Adjust to your test report location
             archiveArtifacts artifacts: '**/coverage/**', allowEmptyArchive: true
+            script {
+                // Wait for SonarQube analysis to be completed
+                timeout(time: 1, unit: 'HOURS') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
         }
     }
 }
