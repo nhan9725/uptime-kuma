@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        SONARCLOUD = 'Sonarcloud'
+        SONARCLOUD = 'SONARCLOUD' // Ensure this is the correct credentials ID
         SONAR_ORG = 'test-sonar' // Your Sonar organization
         SONAR_PROJECT_KEY = 'test-3107' // Your Sonar project key
     }
@@ -15,6 +15,32 @@ pipeline {
 //                checkout scm
 //            }
 //    }
+        stage('Compile and Run Sonar Analysis') {
+            steps {
+                script {
+                    withSonarQubeEnv('Sonarcloud') { // Use the SonarQube environment configured in Jenkins
+                        try {
+                            if (fileExists('package.json')) {
+                                sh """
+                                    ${sonarscanner} \
+                                    -Dsonar.organization=${SONAR_ORG} \
+                                    -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+                                    -Dsonar.sources=. \
+                                    -Dsonar.host.url=https://sonarcloud.io \
+                                    -Dsonar.login=${SONARCLOUD}
+                                """
+                            } else {
+                                currentBuild.result = 'FAILURE'
+                                error("Unsupported application type: No compatible build steps available.")
+                            }
+                        } catch (Exception e) {
+                            currentBuild.result = 'FAILURE'
+                            error("Error during Sonar analysis: ${e.message}")
+                        }
+                    }
+                }
+            }
+        }
 
         stage('Unit Test') {
             steps {
@@ -33,27 +59,7 @@ pipeline {
                 }
             }
         }        
-        
-        stage('Compile and Run Sonar Analysis') {
-            steps {
-                script {
-                    withSonarQubeEnv(credentialsId: SONARCLOUD, installationName: 'Sonarcloud') {
-                        try {
-                            if (fileExists('package.json')) {
-                                sh "${sonarscanner} -Dsonar.organization=${SONAR_ORG} -Dsonar.projectKey=${SONAR_PROJECT_KEY} -Dsonar.sources=. -Dsonar.host.url=https://sonarcloud.io"
-                            } else {
-                                currentBuild.result = 'FAILURE'
-                                error("Unsupported application type: No compatible build steps available.")
-                            }
-                        } catch (Exception e) {
-                            currentBuild.result = 'FAILURE'
-                            error("Error during Sonar analysis: ${e.message}")
-                        }
-                    }
-                }
-            }
-        }
-        
+                
         stage('Deploy') {
             steps {
                 script {
@@ -76,16 +82,16 @@ pipeline {
         }
     }
     
-    post {
-        always {
-            junit 'reports/**/*.xml' // Adjust to your test report location
-            archiveArtifacts artifacts: '**/coverage/**', allowEmptyArchive: true
-            script {
-                // Wait for SonarQube analysis to be completed
-                timeout(time: 1, unit: 'HOURS') {
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
-    }
+    // post {
+    //     always {
+    //         junit 'reports/**/*.xml' // Adjust to your test report location
+    //         archiveArtifacts artifacts: '**/coverage/**', allowEmptyArchive: true
+    //         script {
+    //             // Wait for SonarQube analysis to be completed
+    //             timeout(time: 1, unit: 'HOURS') {
+    //                 waitForQualityGate abortPipeline: true
+    //             }
+    //         }
+    //     }
+    // }
 }
