@@ -71,7 +71,14 @@
         "quick-run-nightly": "docker run --rm --env NODE_ENV=development -p 3001:3001 louislam/uptime-kuma:nightly2",
         "start-dev-container": "cd docker && docker-compose -f docker-compose-dev.yml up --force-recreate",
         "rebase-pr-to-1.23.X": "node extra/rebase-pr.js 1.23.X",
-        "start-server-node14-win": "private\\node14\\node.exe server/server.js"
+        "start-server-node14-win": "private\\node14\\node.exe server/server.js",
+        "test": "jest --coverage"
+
+    },
+    "jest": {
+        "collectCoverage": true,
+        "coverageReporters": ["lcov", "text", "cobertura"],
+        "coverageDirectory": "coverage"
     },
     "dependencies": {
         "@grpc/grpc-js": "~1.7.3",
