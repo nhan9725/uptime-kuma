@@ -18,10 +18,8 @@ pipeline {
             steps {
                 script {
                     // Install dependencies using Yarn
-                    sh '
-                    yarn install 
-                    yarn build
-                    '
+                    sh 'yarn install'
+                    sh 'yarn build'
                 }
             }
         }
