@@ -15,31 +15,15 @@ pipeline {
 //                checkout scm
 //            }
 //    }
-        stage('Compile and Run Sonar Analysis') {
-            steps {
-                script {
-                    withSonarQubeEnv('SonarCloud') { // Use the SonarQube environment configured in Jenkins
-                        try {
-                            if (fileExists('package.json')) {
-                                sh """
-                                    ${sonarscanner} \
-                                    -Dsonar.organization=${SONAR_ORG} \
-                                    -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-                                    -Dsonar.sources=. \
-                                    -Dsonar.host.url=https://sonarcloud.io \
-                                    -Dsonar.login=${SONARCLOUD}
-                                """
-                            } else {
-                                currentBuild.result = 'FAILURE'
-                                error("Unsupported application type: No compatible build steps available.")
-                            }
-                        } catch (Exception e) {
-                            currentBuild.result = 'FAILURE'
-                            error("Error during Sonar analysis: ${e.message}")
-                        }
-                    }
-                }
+        stage('SonarQube analysis') {
+        steps {
+            script {
+                scannerHome = tool 'sonar-test'// must match the name of an actual scanner installation directory on your Jenkins build agent
             }
+            withSonarQubeEnv('SonarCloud') {// If you have configured more than one global server connection, you can specify its name as configured in Jenkins
+            sh "${scannerHome}/bin/sonar-scanner"
+            }
+        }
         }
 
         stage('Unit Test') {
