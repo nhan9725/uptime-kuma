@@ -18,7 +18,7 @@ pipeline {
         stage('Compile and Run Sonar Analysis') {
             steps {
                 script {
-                    withSonarQubeEnv('Sonarcloud') { // Use the SonarQube environment configured in Jenkins
+                    withSonarQubeEnv('SonarCloud') { // Use the SonarQube environment configured in Jenkins
                         try {
                             if (fileExists('package.json')) {
                                 sh """
