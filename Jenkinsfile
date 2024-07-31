@@ -74,8 +74,6 @@ pipeline {
                 script {
                     // create logs
                     try {
-                        def version = readFile('VERSION').trim() // Ensure VERSION file is read correctly
-                        echo "Testing version ${version}..."
                         // Run tests with coverage
                         sh 'yarn test --coverage'
                     } catch (Exception e) {
