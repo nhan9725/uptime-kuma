@@ -8,13 +8,50 @@ pipeline {
     }
 
     stages {
-
 // no need , because define on configure 
 //        stage('Git Checkout SCM') {
 //            steps {
 //                checkout scm
 //            }
 //    }
+        stage('Unit Install and Build') {
+            steps {
+                script {
+                    // Install dependencies using Yarn
+                    sh '
+                    yarn install 
+                    yarn build
+                    '
+                }
+            }
+        }
+          
+        stage('Unit Test') {
+            steps {
+                script {
+                    def version = readFile('VERSION').trim() // Ensure VERSION file is read correctly
+                    echo "Testing version ${version}..."
+                    // Run tests with coverage
+                    sh 'yarn test --coverage'
+                }
+            }
+        }     
+  
+        stage('Code Coverage') {
+            steps {
+                script {
+                    // Record and publish code coverage reports using JaCoCo
+                    recordCoverage tools: [[parser: 'JACOCO']],
+                        id: 'jacoco', name: 'JaCoCo Coverage',
+                        sourceCodeRetention: 'EVERY_BUILD',
+                        qualityGates: [
+                            [threshold: 60.0, metric: 'LINE', baseline: 'PROJECT', unstable: true],
+                            [threshold: 60.0, metric: 'BRANCH', baseline: 'PROJECT', unstable: true]
+                        ]
+                }
+            }
+        } 
+
         stage('SonarQube analysis') {
         steps {
             script {
@@ -27,27 +64,13 @@ pipeline {
                 -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
                 -Dsonar.sources=. \
                 -Dsonar.host.url=https://sonarcloud.io    
+                -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+                -Dsonar.coverage.jacoco.xmlReportPaths=coverage/cobertura-coverage.xml
             """
                 }
             }
         } 
-        stage('Unit Test') {
-            steps {
-                script {
-                    // Install dependencies using Yarn
-                    sh 'yarn install'
-                }
-            }
-        }
-        
-        stage('Build') {
-            steps {
-                script {
-                    // Build the application
-                    sh 'yarn build'
-                }
-            }
-        }        
+     
                 
         stage('Deploy') {
             steps {
