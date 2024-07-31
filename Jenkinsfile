@@ -6,6 +6,8 @@ pipeline {
         SONAR_ORG = 'test-3107' // Your Sonar organization
         SONAR_PROJECT_KEY = 'test-3107' // Your Sonar project key
         CACHE_KEY = '' // To store the checksum of package.json
+        CACHE_DIR = '/mnt/' // Cache directory on the Jenkins agent
+
     }
 
     stages {
@@ -26,16 +28,17 @@ pipeline {
                     echo "Calculated Checksum: ${CACHE_KEY}"
 
                     def cacheHit = false
-                    if (fileExists("dependencies-${CACHE_KEY}.tar")) {
+                    def cachePath = "${env.CACHE_DIR}/dependencies-${CACHE_KEY}.tar"
+                    if (fileExists(cachePath)) {
                         echo "Cache hit, extracting dependencies..."
-                        sh "tar -xf dependencies-${CACHE_KEY}.tar"
+                        sh "tar -xf ${cachePath}"
                         cacheHit = true
                     }
 
                     if (!cacheHit) {
                         echo "Cache miss, running yarn install..."
                         sh 'yarn install'
-                        sh "tar -cf dependencies-${CACHE_KEY}.tar node_modules"
+                        sh "mkdir -p ${env.CACHE_DIR} && tar -cf ${cachePath} node_modules"
                     }
                 }
             }
