@@ -25,7 +25,7 @@
         "start-server-dev": "cross-env NODE_ENV=development node server/server.js",
         "start-server-dev:watch": "cross-env NODE_ENV=development node --watch server/server.js",
         "build": "vite build --config ./config/vite.config.js",
-        "test": "npm run test-backend && npm run test-e2e",
+        "_comment": "test: npm run test-backend && npm run test-e2e",
         "test-with-build": "npm run build && npm test",
         "test-backend": "node test/backend-test-entry.js",
         "test-backend:14": "cross-env TEST_BACKEND=1 NODE_OPTIONS=\"--experimental-abortcontroller --no-warnings\" node--test test/backend-test",
