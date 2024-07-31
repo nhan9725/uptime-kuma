@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        SONARCLOUD = '19bd931423b14896bb34a86acaf822526f817a8a' // Ensure this is the correct credentials ID
+        SONARCLOUD = 'test-sonar' // Ensure this is the correct credentials ID
         SONAR_ORG = 'test-sonar' // Your Sonar organization
         SONAR_PROJECT_KEY = 'test-3107' // Your Sonar project key
     }
@@ -21,11 +21,16 @@ pipeline {
                 scannerHome = tool 'sonar-test'// must match the name of an actual scanner installation directory on your Jenkins build agent
             }
             withSonarQubeEnv('SonarCloud') {// If you have configured more than one global server connection, you can specify its name as configured in Jenkins
-            sh "${scannerHome}/bin/sonar-scanner"
+            sh """
+                ${scannerHome}/bin/sonar-scanner \
+                -Dsonar.organization=${SONAR_ORG} \
+                -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+                -Dsonar.sources=. \
+                -Dsonar.host.url=https://sonarcloud.io    
+            """
+                }
             }
-        }
-        }
-
+        } 
         stage('Unit Test') {
             steps {
                 script {
