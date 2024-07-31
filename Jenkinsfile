@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         SONARCLOUD = 'test-sonar' // Ensure this is the correct credentials ID
-        SONAR_ORG = 'test-sonar' // Your Sonar organization
+        SONAR_ORG = 'test-3107' // Your Sonar organization
         SONAR_PROJECT_KEY = 'test-3107' // Your Sonar project key
     }
 
