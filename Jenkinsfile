@@ -82,16 +82,16 @@ pipeline {
         }
     }
     
-    // post {
-    //     always {
-    //         junit 'reports/**/*.xml' // Adjust to your test report location
-    //         archiveArtifacts artifacts: '**/coverage/**', allowEmptyArchive: true
-    //         script {
-    //             // Wait for SonarQube analysis to be completed
-    //             timeout(time: 1, unit: 'HOURS') {
-    //                 waitForQualityGate abortPipeline: true
-    //             }
-    //         }
-    //     }
-    // }
+    post {
+        always {
+            junit 'reports/**/*.xml' // Adjust to your test report location
+            archiveArtifacts artifacts: '**/coverage/**', allowEmptyArchive: true
+            script {
+                // Wait for SonarQube analysis to be completed
+                timeout(time: 1, unit: 'HOURS') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+    }
 }
