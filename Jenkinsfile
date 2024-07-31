@@ -5,6 +5,7 @@ pipeline {
         SONARCLOUD = 'test-sonar' // Ensure this is the correct credentials ID
         SONAR_ORG = 'test-3107' // Your Sonar organization
         SONAR_PROJECT_KEY = 'test-3107' // Your Sonar project key
+        CACHE_KEY = '' // To store the checksum of package.json
     }
 
     stages {
@@ -72,6 +73,12 @@ pipeline {
         stage('Unit Test') {
             steps {
                 script {
+                    if (fileExists('VERSION')) {
+                        def version = readFile('VERSION').trim() // Ensure VERSION file is read correctly
+                        echo "Testing version ${version}..."
+                    } else {
+                        echo "VERSION file not found, skipping version display."
+                    }
                     // create logs
                     try {
                         // Run tests with coverage
