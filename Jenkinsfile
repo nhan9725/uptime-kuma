@@ -72,10 +72,17 @@ pipeline {
         stage('Unit Test') {
             steps {
                 script {
-                    def version = readFile('VERSION').trim() // Ensure VERSION file is read correctly
-                    echo "Testing version ${version}..."
-                    // Run tests with coverage
-                    sh 'yarn test --coverage'
+                    // create logs
+                    try {
+                        def version = readFile('VERSION').trim() // Ensure VERSION file is read correctly
+                        echo "Testing version ${version}..."
+                        // Run tests with coverage
+                        sh 'yarn test --coverage'
+                    } catch (Exception e) {
+                        echo "Error during testing: ${e.message}"
+                        currentBuild.result = 'FAILURE'
+                        throw e
+                    }
                 }
             }
         }     
@@ -83,14 +90,20 @@ pipeline {
         stage('Code Coverage') {
             steps {
                 script {
-                    // Record and publish code coverage reports using JaCoCo
-                    recordCoverage tools: [[parser: 'JACOCO']],
-                        id: 'jacoco', name: 'JaCoCo Coverage',
-                        sourceCodeRetention: 'EVERY_BUILD',
-                        qualityGates: [
-                            [threshold: 60.0, metric: 'LINE', baseline: 'PROJECT', unstable: true],
-                            [threshold: 60.0, metric: 'BRANCH', baseline: 'PROJECT', unstable: true]
-                        ]
+                    try {
+                        // Record and publish code coverage reports using JaCoCo
+                        recordCoverage tools: [[parser: 'JACOCO']],
+                            id: 'jacoco', name: 'JaCoCo Coverage',
+                            sourceCodeRetention: 'EVERY_BUILD',
+                            qualityGates: [
+                                [threshold: 60.0, metric: 'LINE', baseline: 'PROJECT', unstable: true],
+                                [threshold: 60.0, metric: 'BRANCH', baseline: 'PROJECT', unstable: true]
+                            ]
+                    } catch (Exception e) {
+                        echo "Error during code coverage: ${e.message}"
+                        currentBuild.result = 'FAILURE'
+                        throw e
+                    }
                 }
             }
         } 
