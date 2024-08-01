@@ -44,6 +44,13 @@ pipeline {
             }
         }
 
+        stage('Wait for Input') {
+            steps {
+                script {
+                    input message: 'Proceed to analysis?', ok: 'Yes'
+                }
+            }
+        } 
         // stage('Install Dependencies') {
         //     steps {
         //         script {
