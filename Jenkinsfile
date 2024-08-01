@@ -6,7 +6,7 @@ pipeline {
         SONAR_ORG = 'test-3107' // Your Sonar organization
         SONAR_PROJECT_KEY = 'test-3107' // Your Sonar project key
         CACHE_KEY = '' // To store the checksum of package.json
-        CACHE_DIR = '/home/jenkins/agent' // Cache directory on the Jenkins agent
+        CACHE_DIR = '/home/jenkins/test' // Cache directory on the Jenkins agent
 
     }
 
