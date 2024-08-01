@@ -80,27 +80,28 @@ pipeline {
                 }
             }
         }          
-        // stage('Unit Test') {
-        //     steps {
-        //         script {
-        //             if (fileExists('VERSION')) {
-        //                 def version = readFile('VERSION').trim() // Ensure VERSION file is read correctly
-        //                 echo "Testing version ${version}..."
-        //             } else {
-        //                 echo "VERSION file not found, skipping version display."
-        //             }
-        //             // create logs
-        //             try {
-        //                 // Run tests with coverage
-        //                 sh 'yarn test --coverage'
-        //             } catch (Exception e) {
-        //                 echo "Error during testing: ${e.message}"
-        //                 currentBuild.result = 'FAILURE'
-        //                 throw e
-        //             }
-        //         }
-        //     }
-        // }           
+
+        stage('Unit Test') {
+            steps {
+                script {
+                    if (fileExists('VERSION')) {
+                        def version = readFile('VERSION').trim() // Ensure VERSION file is read correctly
+                        echo "Testing version ${version}..."
+                    } else {
+                        echo "VERSION file not found, skipping version display."
+                    }
+                    // create logs
+                    try {
+                        // Run tests with coverage
+                        sh 'yarn test --coverage'
+                    } catch (Exception e) {
+                        echo "Error during testing: ${e.message}"
+                        currentBuild.result = 'FAILURE'
+                        throw e
+                    }
+                }
+            }
+        }          
   
         stage('Code Coverage') {
             steps {
