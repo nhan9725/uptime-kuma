@@ -78,14 +78,14 @@ pipeline {
                     }
                 }
             }
-        }
 
         stage('Wait for Input') {
             steps {
                 script {
                     input message: 'Proceed to SonarQube analysis?', ok: 'Yes'
                     }
-        }          
+        }  
+        }        
 
         stage('Unit Test') {
             steps {
