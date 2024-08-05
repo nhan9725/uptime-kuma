@@ -31,18 +31,7 @@ spec:
           name: jenkins-cache
         - mountPath: /home/jenkins/agent
           name: workspace-volume
-          readOnly: false  
-      - name: jnlp    
-        image: "jenkins/inbound-agent:3256.v88a_f6e922152-1"
-        volumeMounts:
-        - mountPath: /home/jenkins/.cache
-          name: jenkins-cache
-          readOnly: false
-        - mountPath: /home/jenkins/agent
-          name: workspace-volume
-          readOnly: false
-      nodeSelector:
-        instancePurpose: deployment              
+          readOnly: false              
       volumes:
         - type: PVC
           claimName: jenkins-cache
