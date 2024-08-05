@@ -11,7 +11,7 @@ pipeline {
                 stage('Next.js Build') {
                     steps {
                         container('nextjs') {
-                            sh 'npm install && npm run build'
+                            sh 'yarn install && yarn run build'
                         }
                     }
                 }
