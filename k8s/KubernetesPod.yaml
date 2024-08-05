@@ -21,9 +21,7 @@ spec:
         command: ["sh", "-c"]
         args: ['\$(JENKINS_SECRET)', '\$(JENKINS_NAME)']
         tty: true
-        runAsUser: 1000
-        runAsGroup: 1000
-        containerSecurityContext:
+        SecurityContext:
           runAsUser: 1000
           runAsGroup: 1000
           readOnlyRootFilesystem: false
@@ -32,7 +30,8 @@ spec:
         - mountPath: /home/jenkins/.cache
           name: jenkins-cache
       volumes:
-      - name: jenkins-cache
-        persistentVolumeClaim:
+        - type: PVC
           claimName: jenkins-cache
+          mountPath: /home/jenkins/.cache
+          readOnly: false
 
