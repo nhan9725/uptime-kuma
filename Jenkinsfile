@@ -26,7 +26,6 @@ pipeline {
             steps {
                 container(nextjs) {
                 script {
-                    container('nextjs') {
                     CACHE_KEY = sh(
                         script: 'md5sum package.json | awk \'{ print $1 }\'',
                         returnStdout: true
@@ -177,7 +176,6 @@ pipeline {
                 }
             }
         }
-    }
     }
     
     post {
