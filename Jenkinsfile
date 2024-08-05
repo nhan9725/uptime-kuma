@@ -1,9 +1,9 @@
 pipeline {
-    agent {
-    kubernetes {
-      yamlFile 'k8s/KubernetesPod.yaml'
-    }
-     }
+    agent any
+    // kubernetes {
+    //   yamlFile 'k8s/KubernetesPod.yaml'
+    // }
+     
 
     environment {
         SONARCLOUD = 'test-sonar' // Ensure this is the correct credentials ID
