@@ -19,7 +19,8 @@ spec:
       - name: nextjs
         image: public.ecr.aws/n3g1a9g4/custom-image:test-docker-3
         command: ["sh", "-c"]
-        args: [" echo Deployment Job release "]
+        args: ['\$(JENKINS_SECRET)', '\$(JENKINS_NAME)']
+        tty: true
         runAsUser: 1000
         runAsGroup: 1000
         containerSecurityContext:
