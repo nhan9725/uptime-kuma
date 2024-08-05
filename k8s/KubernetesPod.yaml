@@ -33,9 +33,9 @@ spec:
           name: workspace-volume
           readOnly: false              
       volumes:
-        - type: PVC
-          claimName: jenkins-cache
-          readOnly: false
+        - name: jenkins-cache
+          persistentVolumeClaim: 
+            claimName: jenkins-cache
         - type: EmptyDir
           name: workspace-volume          
 
