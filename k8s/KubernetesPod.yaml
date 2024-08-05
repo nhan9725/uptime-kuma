@@ -35,3 +35,13 @@ spec:
   - emptyDir:
       medium: ""
     name: workspace-volume
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: instancePurpose
+                operator: In
+                values:
+                - deployment
