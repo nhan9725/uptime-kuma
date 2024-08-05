@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    some-label: nextjs
+spec:
+  template:
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: instancePurpose
+                operator: In
+                values:
+                - deployment
+      containers:
+      - name: nextjs
+        image: public.ecr.aws/n3g1a9g4/custom-image:test-docker-3
+        command: ["sh", "-c"]
+        args: [" echo Deployment Job release "]
+        runAsUser: 1000
+        runAsGroup: 1000
+        containerSecurityContext:
+          runAsUser: 1000
+          runAsGroup: 1000
+          readOnlyRootFilesystem: false
+          allowPrivilegeEscalation: false        
+        volumeMounts:
+        - mountPath: /home/jenkins/.cache
+          name: jenkins-cache
+      volumes:
+      - name: jenkins-cache
+        persistentVolumeClaim:
+          claimName: jenkins-cache
+
