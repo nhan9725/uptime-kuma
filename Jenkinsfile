@@ -24,6 +24,7 @@ pipeline {
 
         stage('Cache Calculate Checksum if Installed Dependencies') {
             steps {
+                container('nextjs') {
                 script {
                     CACHE_KEY = sh(
                         script: 'md5sum package.json | awk \'{ print $1 }\'',
@@ -45,7 +46,7 @@ pipeline {
                         sh "mkdir -p ${env.CACHE_DIR} && tar -cf ${cachePath} node_modules"
                     }
                     }
-                
+                }
             }
         }
 
@@ -70,6 +71,7 @@ pipeline {
 
         stage('Unit Install and Build') {
             steps {
+             container('nextjs') {
                 script {
                     
                     // Install dependencies using Yarn
@@ -78,12 +80,15 @@ pipeline {
                     }
                 }
             }
+          }
 
         stage('Wait for Input') {
             steps {
+               container('nextjs') {  
                 script {
                     input message: 'Proceed to SonarQube analysis?', ok: 'Yes'
                     }
+               }
         }  
         }        
 
