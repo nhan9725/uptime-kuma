@@ -1,8 +1,8 @@
 pipeline {
-    agent any
-    // kubernetes {
-    //   yamlFile 'k8s/KubernetesPod.yaml'
-    // }
+    // agent any
+    kubernetes {
+      yamlFile 'k8s/KubernetesPod.yaml'
+    }
      
 
     environment {

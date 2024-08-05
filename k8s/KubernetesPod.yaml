@@ -17,7 +17,7 @@ spec:
                 - deployment
       containers:
       - name: nextjs
-        image: public.ecr.aws/n3g1a9g4/custom-image:test-docker-3
+        image: public.ecr.aws/n3g1a9g4/custom-image:test-docker-5
         command: ["sh", "-c"]
         args: ['\$(JENKINS_SECRET)', '\$(JENKINS_NAME)']
         tty: true
