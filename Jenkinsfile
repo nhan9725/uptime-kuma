@@ -82,12 +82,9 @@ pipeline {
 
         stage('Wait for Input') {
             steps {
-                container('nextjs') {
                 script {
-                    
                     input message: 'Proceed to SonarQube analysis?', ok: 'Yes'
                     }
-            }
         }          
 
         stage('Unit Test') {
