@@ -14,7 +14,8 @@ pipeline {
 
     }
 
-    stages {
+    node(nextjs) {
+        container(nextjs) {
 // no need , because define on configure 
 //        stage('Git Checkout SCM') {
 //            steps {
@@ -169,6 +170,7 @@ pipeline {
             }
         }
     }
+    
     
     post {
         always {
