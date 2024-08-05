@@ -26,7 +26,7 @@ spec:
       name: workspace-volume
       readOnly: false
   nodeSelector:
-    kubernetes.io/os: linux
+    instancePurpose: deployment
   restartPolicy: Never
   volumes:
   - name: jenkins-cache
@@ -35,13 +35,4 @@ spec:
   - emptyDir:
       medium: ""
     name: workspace-volume
-    spec:
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: instancePurpose
-                operator: In
-                values:
-                - deployment
+
