@@ -25,31 +25,31 @@ pipeline {
         stage('Cache Calculate Checksum if Installed Dependencies') {
             steps {
                 container('nextjs') {
-                script {
-                    CACHE_KEY = sh(
-                        script: 'md5sum package.json | awk \'{ print $1 }\'',
-                        returnStdout: true
-                    ).trim()
-                    echo "Calculated Checksum: ${CACHE_KEY}"
+                    script {
+                        // Calculate the checksum for package.json
+                        CACHE_KEY = sh(
+                            script: 'md5sum package.json | awk \'{ print $1 }\'',
+                            returnStdout: true
+                        ).trim()
+                        echo "Calculated Checksum: ${CACHE_KEY}"
 
-                    def cacheHit = false
-                    def cachePath = "${env.CACHE_DIR}/dependencies-${CACHE_KEY}.tar"
-                    if (fileExists(cachePath)) {
-                        echo "Cache hit, extracting dependencies..."
-                        sh "tar -xf ${cachePath}"
-                        cacheHit = true
-                    }
+                        // Define the path to the cache file
+                        def cachePath = "${env.CACHE_DIR}/dependencies-${CACHE_KEY}.tar"
 
-                    if (!cacheHit) {
-                        echo "Cache miss, running yarn install..."
-                        sh 'yarn install'
-                        sh "mkdir -p ${env.CACHE_DIR} && tar -cf ${cachePath} node_modules"
-                    }
+                        // Check if the cache file exists
+                        def cacheHit = fileExists(cachePath)
+                        if (cacheHit) {
+                            echo "Cache hit, extracting dependencies..."
+                            sh "tar -xf ${cachePath}"
+                        } else {
+                            echo "Cache miss, running yarn install..."
+                            sh 'yarn install'
+                            sh "mkdir -p ${env.CACHE_DIR} && tar -cf ${cachePath} node_modules"
+                        }
                     }
                 }
             }
         }
-
         // stage('Install Dependencies') {
         //     steps {
         //         script {
