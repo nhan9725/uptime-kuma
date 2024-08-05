@@ -24,6 +24,7 @@ pipeline {
 
         stage('Cache Calculate Checksum if Installed Dependencies') {
             steps {
+                container(nextjs) {
                 script {
                     container('nextjs') {
                     CACHE_KEY = sh(
@@ -71,8 +72,9 @@ pipeline {
 
         stage('Unit Install and Build') {
             steps {
+                container('nextjs') {
                 script {
-                    container('nextjs') {
+                    
                     // Install dependencies using Yarn
                //     sh 'yarn install'
                     sh 'yarn build'
@@ -83,8 +85,9 @@ pipeline {
 
         stage('Wait for Input') {
             steps {
+                container('nextjs') {
                 script {
-                    container('nextjs') {
+                    
                     input message: 'Proceed to SonarQube analysis?', ok: 'Yes'
                     }
                 }
