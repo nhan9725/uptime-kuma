@@ -4,39 +4,34 @@ metadata:
   labels:
     some-label: nextjs
 spec:
-  template:
-    spec:
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: instancePurpose
-                operator: In
-                values:
-                - deployment
-      containers:
-      - name: nextjs
-        image: public.ecr.aws/n3g1a9g4/custom-image:test-docker-5
-        command: ["sh", "-c"]
-        args: ['\$(JENKINS_SECRET)', '\$(JENKINS_NAME)']
-        tty: true
-        SecurityContext:
-          runAsUser: 1000
-          runAsGroup: 1000
-          readOnlyRootFilesystem: false
-          allowPrivilegeEscalation: false        
-        volumeMounts:
-        - mountPath: /home/jenkins/.cache
-          name: jenkins-cache
-        - mountPath: /home/jenkins/agent
-          name: workspace-volume
-          readOnly: false              
-      restartPolicy: Never              
-      volumes:
-        - name: jenkins-cache
-          persistentVolumeClaim:
-            claimName: jenkins-cache
-        - emptyDir:
-            medium: ""
-          name: workspace-volume
+  containers:
+  - name: nextjs
+    image: public.ecr.aws/n3g1a9g4/custom-image:test-docker-5
+    command: ["sh", "-c", "cat"]
+    tty: true
+    securityContext:
+      runAsUser: 1000
+      runAsGroup: 1000
+      readOnlyRootFilesystem: false
+      allowPrivilegeEscalation: false
+    volumeMounts:
+    - mountPath: /home/jenkins/.cache
+      name: jenkins-cache
+    - mountPath: /home/jenkins/agent
+      name: workspace-volume
+  - name: jnlp
+    image: "jenkins/inbound-agent:3248.v65ecb_254c298-2"
+    volumeMounts:
+    - mountPath: /home/jenkins/agent
+      name: workspace-volume
+      readOnly: false
+  nodeSelector:
+    kubernetes.io/os: linux
+  restartPolicy: Never
+  volumes:
+  - name: jenkins-cache
+    persistentVolumeClaim:
+      claimName: jenkins-cache
+  - emptyDir:
+      medium: ""
+    name: workspace-volume
