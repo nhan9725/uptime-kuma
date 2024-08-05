@@ -32,10 +32,19 @@ spec:
         - mountPath: /home/jenkins/agent
           name: workspace-volume
           readOnly: false              
+      - name: jnlp
+        image: "jenkins/inbound-agent:3256.v88a_f6e922152-1"
+        volumeMounts:
+        - mountPath: /home/jenkins/agent
+          name: workspace-volume
+          readOnly: false
+      nodeSelector:
+        kubernetes.io/os: linux
+      restartPolicy: Never              
       volumes:
         - name: jenkins-cache
-          persistentVolumeClaim: 
+          persistentVolumeClaim:
             claimName: jenkins-cache
-        - type: EmptyDir
-          name: workspace-volume          
-
+        - emptyDir:
+            medium: ""
+          name: workspace-volume
