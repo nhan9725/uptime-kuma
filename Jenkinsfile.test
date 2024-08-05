@@ -1,0 +1,21 @@
+pipeline {
+    agent {
+        kubernetes {
+            yamlFile 'k8s/KubernetesPod.yaml'
+        }
+    }
+    stages {
+        stage('Build') {
+            stages {
+                stage('Next.js Build') {
+                    steps {
+                        container('nextjs') {
+                            sh 'npm install && npm run build'
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
