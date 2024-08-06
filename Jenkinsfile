@@ -77,6 +77,7 @@ pipeline {
                     // Install dependencies using Yarn
                //     sh 'yarn install'
                     sh 'yarn build'
+                    sh 'yarn cache dir'
                     }
                 }
             }
