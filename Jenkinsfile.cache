@@ -1,0 +1,96 @@
+pipeline {
+    agent {
+  kubernetes {
+    yamlFile 'k8s/KubernetesPod.yaml' 
+}
+  }
+
+    environment {
+        YARN_CACHE_FOLDER = "${env.WORKSPACE}/.yarn_cache"
+    }
+
+    stages {
+        stage('Prepare') {
+            steps {
+                script {
+                    // Attempt to unstash the yarn cache and node_modules directory from a previous build
+                    try {
+                        unstash name: 'yarn-cache'
+                        unstash name: 'node-modules'
+                    } catch (e) {
+                        echo "No previous cache found, installing dependencies."
+                    }
+                }
+            }
+        }
+
+        stage('Check for Dependency Changes') {
+            steps {
+                script {
+                    // Check if package.json or yarn.lock has changed
+                    def hasChanges = sh(script: 'git diff --name-only HEAD^ HEAD | grep -E "package.json|yarn.lock"', returnStatus: true) == 0
+                    if (hasChanges) {
+                        echo "package.json or yarn.lock changed, installing dependencies."
+                        env.INSTALL_DEPENDENCIES = "true"
+                    } else {
+                        echo "No changes in package.json or yarn.lock, skipping dependency installation."
+                        env.INSTALL_DEPENDENCIES = "false"
+                    }
+                }
+            }
+        }
+
+        stage('Install Dependencies') {
+            when {
+                expression { env.INSTALL_DEPENDENCIES == "true" }
+            }
+            steps {
+                script {
+                    // Set the Yarn cache folder environment variable
+                    sh 'yarn config set cache-folder $YARN_CACHE_FOLDER'
+
+                    // Install dependencies
+                    sh 'yarn install'
+
+                    // Stash the node_modules and Yarn cache directory for future use
+                    stash name: 'node-modules', includes: 'node_modules/**'
+                    stash name: 'yarn-cache', includes: '.yarn_cache/**'
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                script {
+                    // Run your build steps
+                    sh 'yarn build'
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                script {
+                    // Run your test steps
+                    sh 'yarn test'
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    // Run your deploy steps
+                    sh 'yarn deploy'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // Clean up stashed files
+            cleanWs()
+        }
+    }
+}
