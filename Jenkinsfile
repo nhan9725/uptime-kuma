@@ -10,7 +10,7 @@ pipeline {
         SONAR_ORG = 'test-3107' // Your Sonar organization
         SONAR_PROJECT_KEY = 'test-3107' // Your Sonar project key
         CACHE_KEY = '' // To store the checksum of package.json
-        CACHE_DIR = '/home/jenkins/.cache/yarn' // Cache directory on the Jenkins agent
+        CACHE_DIR = '/home/jenkins/agent/yarn-cache' // Cache directory on the Jenkins agent
 
     }
 
@@ -35,10 +35,9 @@ pipeline {
 
                         // Define the path to the cache file
                         def cachePath = "${env.CACHE_DIR}/dependencies-${CACHE_KEY}.tar"
-                        def cacheFile = new File(cachePath)
 
                         // Check if the cache file exists
-                        if (cacheFile.exists()) {
+                        if (cachePath.exists()) {
                             println "Cache hit, extracting dependencies..."
                             sh "tar -xf ${cachePath}"
                         }
