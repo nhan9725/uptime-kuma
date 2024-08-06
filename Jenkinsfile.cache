@@ -4,57 +4,46 @@ pipeline {
     yamlFile 'k8s/KubernetesPod.yaml' 
 }
   }
-
     environment {
-        YARN_CACHE_FOLDER = "${env.WORKSPACE}/.yarn_cache"
+        YARN_CACHE_FOLDER = "/home/jenkins/.yarn_cache"
     }
 
     stages {
         stage('Prepare') {
             steps {
                 script {
-                    // Attempt to unstash the yarn cache and node_modules directory from a previous build
-                    try {
-                        unstash name: 'yarn-cache'
-                        unstash name: 'node-modules'
-                    } catch (e) {
-                        echo "No previous cache found, installing dependencies."
-                    }
-                }
-            }
-        }
+                    // Calculate hash of package.json and yarn.lock
+                    def hash = sh(script: 'md5sum package.json yarn.lock | md5sum | cut -d" " -f1', returnStdout: true).trim()
+                    env.CACHE_FILE = "dependencies-${hash}.tar"
 
-        stage('Check for Dependency Changes') {
-            steps {
-                script {
-                    // Check if package.json or yarn.lock has changed
-                    def hasChanges = sh(script: 'git diff --name-only HEAD^ HEAD | grep -E "package.json|yarn.lock"', returnStatus: true) == 0
-                    if (hasChanges) {
-                        echo "package.json or yarn.lock changed, installing dependencies."
-                        env.INSTALL_DEPENDENCIES = "true"
+                    echo "Calculated cache file: ${env.CACHE_FILE}"
+
+                    // Check if the cache file exists
+                    if (fileExists(env.CACHE_FILE)) {
+                        echo "Cache hit, extracting dependencies..."
+                        sh "tar -xf ${env.CACHE_FILE}"
                     } else {
-                        echo "No changes in package.json or yarn.lock, skipping dependency installation."
-                        env.INSTALL_DEPENDENCIES = "false"
+                        echo "No cache found, installing dependencies."
                     }
                 }
             }
         }
 
         stage('Install Dependencies') {
-            when {
-                expression { env.INSTALL_DEPENDENCIES == "true" }
-            }
             steps {
                 script {
                     // Set the Yarn cache folder environment variable
                     sh 'yarn config set cache-folder $YARN_CACHE_FOLDER'
 
-                    // Install dependencies
-                    sh 'yarn install'
+                    // Check if we need to install dependencies
+                    def cacheHit = fileExists('node_modules')
+                    if (!cacheHit) {
+                        // Install dependencies
+                        sh 'yarn install'
 
-                    // Stash the node_modules and Yarn cache directory for future use
-                    stash name: 'node-modules', includes: 'node_modules/**'
-                    stash name: 'yarn-cache', includes: '.yarn_cache/**'
+                        // Create the tar file for caching
+                        sh "tar -cf ${env.CACHE_FILE} node_modules .yarn_cache"
+                    }
                 }
             }
         }
