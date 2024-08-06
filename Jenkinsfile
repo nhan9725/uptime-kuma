@@ -37,12 +37,11 @@ pipeline {
                         def cachePath = "${env.CACHE_DIR}/dependencies-${CACHE_KEY}.tar"
 
                         // Check if the cache file exists
-                        if (cachePath.exists()) {
-                            println "Cache hit, extracting dependencies..."
+                        def cacheHit = fileExists(cachePath)
+                        if (cacheHit) {
+                            echo "Cache hit, extracting dependencies..."
                             sh "tar -xf ${cachePath}"
-                        }
-                        // Add your code to extract dependencies here
-                        else {
+                        } else {
                             echo "Cache miss, running yarn install..."
                             sh 'yarn install'
                             sh "mkdir -p ${env.CACHE_DIR} && tar -cf ${cachePath} node_modules"
