@@ -5,16 +5,32 @@ pipeline {
 }
   }
     environment {
-        YARN_CACHE_FOLDER = "/home/jenkins/.yarn_cache"
+        YARN_CACHE_FOLDER = "/home/jenkins/.cache/yarn"
     }
 
     stages {
+
+//
+stage ('Check for existence of index.html') {
+    agent any # Could be a top-level directive or a stage level directive
+    steps {
+        script {
+            if (fileExists('/home/jenkins/.cache/yarn/dependencies-9e80c5051af62a08fc2b6cc2b5f90e02.tar')) {
+                echo "File home/jenkins/.cache/yarn/dependencies-9e80c5051af62a08fc2b6cc2b5f90e02.tar found!"
+            }
+        else {
+            echo "No file found"
+            }
+        }
+    }
+}
+//
         stage('Prepare') {
             steps {
                 script {
                     // Calculate hash of package.json and yarn.lock
                     def hash = sh(script: 'md5sum package.json yarn.lock | md5sum | cut -d" " -f1', returnStdout: true).trim()
-                    env.CACHE_FILE = "dependencies-${hash}.tar"
+                    env.CACHE_FILE = "${YARN_CACHE_FOLDER}/dependencies-${hash}.tar"
 
                     echo "Calculated cache file: ${env.CACHE_FILE}"
 
