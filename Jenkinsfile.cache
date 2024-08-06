@@ -9,17 +9,15 @@ pipeline {
     }
 
     stages {
-
 //
-stage ('Check for existence of index.html') {
-    agent any # Could be a top-level directive or a stage level directive
-    steps {
-        script {
-            if (fileExists('/home/jenkins/.cache/yarn/dependencies-9e80c5051af62a08fc2b6cc2b5f90e02.tar')) {
-                echo "File home/jenkins/.cache/yarn/dependencies-9e80c5051af62a08fc2b6cc2b5f90e02.tar found!"
-            }
-        else {
-            echo "No file found"
+        stage ('Check for existence of index.html') {
+            steps {
+                script {
+                    if (fileExists('/home/jenkins/.cache/yarn/dependencies-9e80c5051af62a08fc2b6cc2b5f90e02.tar')) {
+                    echo "File home/jenkins/.cache/yarn/dependencies-9e80c5051af62a08fc2b6cc2b5f90e02.tar found!"
+                }
+                else {
+                echo "No file found"
             }
         }
     }
@@ -64,32 +62,7 @@ stage ('Check for existence of index.html') {
             }
         }
 
-        stage('Build') {
-            steps {
-                script {
-                    // Run your build steps
-                    sh 'yarn build'
-                }
-            }
-        }
 
-        stage('Test') {
-            steps {
-                script {
-                    // Run your test steps
-                    sh 'yarn test'
-                }
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                script {
-                    // Run your deploy steps
-                    sh 'yarn deploy'
-                }
-            }
-        }
     }
 
     post {
