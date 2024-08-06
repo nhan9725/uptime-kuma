@@ -21,6 +21,19 @@ pipeline {
 //                checkout scm
 //            }
 //    }
+        stage ('Check for existence of index.html') {
+            steps {
+                script {
+                    if (fileExists('home/jenkins/agent/yarn-cache/yarn/dependencies-9e80c5051af62a08fc2b6cc2b5f90e02.tar')) {
+                    echo "File dependencies-9e80c5051af62a08fc2b6cc2b5f90e02.tar found!"
+                }
+                else {
+                echo "No file found"
+            }
+        }
+    }
+}
+
 
         stage('Cache Calculate Checksum if Installed Dependencies') {
             steps {
