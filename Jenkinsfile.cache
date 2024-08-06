@@ -5,7 +5,7 @@ pipeline {
 }
   }
     environment {
-        YARN_CACHE_FOLDER = "/home/jenkins/.cache/yarn"
+        YARN_CACHE_FOLDER = "/home/jenkins/agent/yarn-cache"
     }
 
     stages {
