@@ -12,7 +12,9 @@ pipeline {
 //
         stage ('Check for existence of index.html') {
             steps {
+                container('nextjs') {
                 script {
+                echo "Workspace path: ${env.WORKSPACE}"
                     if (fileExists('/home/jenkins/agent/yarn-cachedependencies-9e80c5051af62a08fc2b6cc2b5f90e02.tar')) {
                     echo "File /home/jenkins/agent/yarn-cache/dependencies-9e80c5051af62a08fc2b6cc2b5f90e02.tar found!"
                 }
@@ -20,11 +22,13 @@ pipeline {
                 echo "No file found"
             }
         }
+        }
     }
 }
 
         stage('Install Dependencies') {
             steps {
+            container('nextjs') {
                 script {
                     // Set the Yarn cache folder environment variable
                     sh 'yarn config set cache-folder $YARN_CACHE_FOLDER'
@@ -39,6 +43,7 @@ pipeline {
                         sh "tar -cf ${env.CACHE_FILE} node_modules .yarn_cache"
                     }
                 }
+            }
             }
         }
 
