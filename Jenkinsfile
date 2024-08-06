@@ -10,7 +10,7 @@ pipeline {
         SONAR_ORG = 'test-3107' // Your Sonar organization
         SONAR_PROJECT_KEY = 'test-3107' // Your Sonar project key
         CACHE_KEY = '' // To store the checksum of package.json
-        CACHE_DIR = '/home/jenkins/agent/yarn-cache' // Cache directory on the Jenkins agent
+        CACHE_DIR = '/home/jenkins/agent/workspace/cache-fe' // Cache directory on the Jenkins agent
 
     }
 
@@ -23,12 +23,14 @@ pipeline {
 //    }
         stage ('Check for existence of index.html') {
             steps {
+                container('nextjs') {
                 script {
-                    if (fileExists('home/jenkins/agent/yarn-cache/yarn/dependencies-9e80c5051af62a08fc2b6cc2b5f90e02.tar')) {
+                    if (fileExists('/home/jenkins/agent/workspace/cache-fe/dependencies-9e80c5051af62a08fc2b6cc2b5f90e02.tar')) {
                     echo "File dependencies-9e80c5051af62a08fc2b6cc2b5f90e02.tar found!"
                 }
                 else {
                 echo "No file found"
+            }
             }
         }
     }
