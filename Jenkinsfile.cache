@@ -22,26 +22,6 @@ pipeline {
         }
     }
 }
-//
-        stage('Prepare') {
-            steps {
-                script {
-                    // Calculate hash of package.json and yarn.lock
-                    def hash = sh(script: 'md5sum package.json yarn.lock | md5sum | cut -d" " -f1', returnStdout: true).trim()
-                    env.CACHE_FILE = "${YARN_CACHE_FOLDER}/dependencies-${hash}.tar"
-
-                    echo "Calculated cache file: ${env.CACHE_FILE}"
-
-                    // Check if the cache file exists
-                    if (fileExists(env.CACHE_FILE)) {
-                        echo "Cache hit, extracting dependencies..."
-                        sh "tar -xf ${env.CACHE_FILE}"
-                    } else {
-                        echo "No cache found, installing dependencies."
-                    }
-                }
-            }
-        }
 
         stage('Install Dependencies') {
             steps {
