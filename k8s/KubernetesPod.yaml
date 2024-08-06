@@ -17,7 +17,7 @@ spec:
       readOnlyRootFilesystem: false
       allowPrivilegeEscalation: false
     volumeMounts:
-    - mountPath: /home/jenkins/agent/workspace/cache-fe
+    - mountPath: /home/jenkins/
       name: jenkins-cache
     - mountPath: /home/jenkins/agent
       name: workspace-volume
