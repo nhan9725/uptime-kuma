@@ -37,6 +37,8 @@ spec:
     volumeMounts:
     - name: docker-graph-storage
       mountPath: /var/lib/docker
+    - name: docker-sock
+      mountPath: /var/run/docker.sock
 
   nodeSelector:
     instancePurpose: deployment
