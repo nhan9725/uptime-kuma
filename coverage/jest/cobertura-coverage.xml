@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!DOCTYPE coverage SYSTEM "http://cobertura.sourceforge.net/xml/coverage-04.dtd">
-<coverage lines-valid="4" lines-covered="4" line-rate="1" branches-valid="4" branches-covered="4" branch-rate="1" timestamp="1723089057659" complexity="0" version="0.1">
+<coverage lines-valid="4" lines-covered="4" line-rate="1" branches-valid="4" branches-covered="4" branch-rate="1" timestamp="1723089172847" complexity="0" version="0.1">
   <sources>
     <source>/home/release-helm/nhan/uptime-kuma</source>
   </sources>
