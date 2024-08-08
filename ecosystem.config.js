@@ -3,7 +3,8 @@ module.exports = {
         name: "uptime-kuma",
         script: "./server/server.js",
     }],
-     collectCoverage: true,
+  testMatch: ['**/test/jest/**/*.spec.js'], // Adjust this pattern to match your test file locations
+  collectCoverage: true,
   coverageDirectory: "coverage",
   coverageReporters: ["lcov", "text"]	
 };

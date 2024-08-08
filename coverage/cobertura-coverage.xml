@@ -1,9 +1,28 @@
 <?xml version="1.0" ?>
 <!DOCTYPE coverage SYSTEM "http://cobertura.sourceforge.net/xml/coverage-04.dtd">
-<coverage lines-valid="0" lines-covered="0" line-rate="NaN" branches-valid="0" branches-covered="0" branch-rate="NaN" timestamp="1722941940359" complexity="0" version="0.1">
+<coverage lines-valid="4" lines-covered="4" line-rate="1" branches-valid="4" branches-covered="4" branch-rate="1" timestamp="1723086169097" complexity="0" version="0.1">
   <sources>
     <source>/home/release-helm/nhan/uptime-kuma</source>
   </sources>
   <packages>
+    <package name="main" line-rate="1" branch-rate="1">
+      <classes>
+        <class name="sum.js" filename="src/sum.js" line-rate="1" branch-rate="1">
+          <methods>
+            <method name="sum" hits="5" signature="()V">
+              <lines>
+                <line number="3" hits="5"/>
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="4" hits="5" branch="true" condition-coverage="100% (4/4)"/>
+            <line number="5" hits="2" branch="false"/>
+            <line number="7" hits="3" branch="false"/>
+            <line number="10" hits="1" branch="false"/>
+          </lines>
+        </class>
+      </classes>
+    </package>
   </packages>
 </coverage>
