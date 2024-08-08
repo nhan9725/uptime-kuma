@@ -27,6 +27,17 @@ spec:
     - mountPath: /home/jenkins/agent
       name: workspace-volume
       readOnly: false
+  - name: docker
+    image: docker:19.03.12-dind
+    securityContext:
+      privileged: true
+    env:
+    - name: DOCKER_TLS_CERTDIR
+      value: ""
+    volumeMounts:
+    - name: docker-graph-storage
+      mountPath: /var/lib/docker
+
   nodeSelector:
     instancePurpose: deployment
   restartPolicy: Never
@@ -37,4 +48,8 @@ spec:
   - emptyDir:
       medium: ""
     name: workspace-volume
-
+  - name: docker-sock
+    hostPath:
+      path: /var/run/docker.sock
+  - name: docker-graph-storage
+    emptyDir: {}
