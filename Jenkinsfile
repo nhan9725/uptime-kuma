@@ -11,6 +11,9 @@ pipeline {
         SONAR_PROJECT_KEY = 'test-3107' // Your Sonar project key
         CACHE_KEY = '' // To store the checksum of package.json
         CACHE_DIR = '/home/jenkins/agent/workspace/cache-fe' // Cache directory on the Jenkins agent
+        PROJECT = 'nextjs'
+        REGION = 'me-south-1'
+        ECR_ID = '082568704422'
     }
 
     stages {
@@ -57,7 +60,7 @@ pipeline {
             }
         }
 
-        stage('Unit Test') {
+        stage('Unit Test and Coverage') {
             steps {
                 container('nextjs') {
                     script {
@@ -114,16 +117,6 @@ pipeline {
             }
         }
 
-        stage('Wait for Input') {
-            steps {
-                container('nextjs') {
-                    script {
-                        input message: 'Proceed to SonarQube analysis?', ok: 'Yes'
-                    }
-                }
-            }
-        }
-
         stage('SonarQube analysis') {
             steps {
                 container('nextjs') {
@@ -144,12 +137,25 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Wait for Input') {
             steps {
                 container('nextjs') {
                     script {
-                        def version = readFile('VERSION').trim() // Ensure VERSION file is read correctly
-                        echo "Deploying version ${version}..."
+                        input message: 'Proceed to SonarQube analysis?', ok: 'Yes'
+                    }
+                }
+            }
+        }
+        stage('Build and push docker image') {
+            steps {
+                container('nextjs') {
+                    script {
+                        withCredentials([usernamePassword(credentialsId: 'ecr-test', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) { 
+                            sh "aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${ECR_ID}.dkr.ecr.${REGION}.amazonaws.com"                       
+                            sh "docker build -t ${PROJECT}:${JOB_NAME}-${BUILD_NUMBER} . -f docker/dockerfile "
+                            sh "docker tag ${PROJECT}:${JOB_NAME}-${BUILD_NUMBER} ${ECR_ID}.dkr.ecr.${REGION}.amazonaws.com/${PROJECT}:${JOB_NAME}-${BUILD_NUMBER}"
+                            sh "docker push ${ECR_ID}.dkr.ecr.${REGION}.amazonaws.com/${PROJECT}:${JOB_NAME}-${BUILD_NUMBER}"
+                        }
                     }
                 }
             }
