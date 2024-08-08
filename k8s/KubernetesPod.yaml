@@ -8,7 +8,7 @@ spec:
     fsGroup: 1000  # Add this to ensure the group has the correct permissions
   containers:
   - name: nextjs
-    image: public.ecr.aws/n3g1a9g4/custom-image:test-docker-5
+    image: public.ecr.aws/n3g1a9g4/custom-image:test-docker-7
     command: ["sh", "-c", "cat"]
     tty: true
     securityContext:
