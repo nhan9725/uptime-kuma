@@ -17,7 +17,7 @@ spec:
       readOnlyRootFilesystem: false
       allowPrivilegeEscalation: false
     volumeMounts:
-    - name: node-modules-cache
+    - name: jenkins-cache
       mountPath: /app/node_modules
     - mountPath: /home/jenkins/agent
       name: workspace-volume
@@ -42,16 +42,16 @@ spec:
     volumeMounts:
       - name: dockersock
         mountPath: /var/run/docker.sock
-      - name: node-modules-cache
+      - name: jenkins-cache
         mountPath: /app/node_modules
 
   volumes:
     - name: dockersock
       hostPath:
         path: /var/run/docker.sock
-    - name: node-modules-cache
+    - name: jenkins-cache
       persistentVolumeClaim:
-        claimName: node-modules-cache
+        claimName: jenkins-cache
     - name: workspace-volume
       emptyDir: {}
   nodeSelector:
