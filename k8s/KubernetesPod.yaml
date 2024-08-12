@@ -40,21 +40,20 @@ spec:
       - name: DOCKER_BUILDKIT
         value: "1"
     volumeMounts:
-      - name: dockersock
-        mountPath: /var/run/docker.sock
-      - name: jenkins-cache
-        mountPath: /app/node_modules
+    - name: dockersock
+      mountPath: /var/run/docker.sock
+    - name: jenkins-cache
+      mountPath: /app/node_modules
 
   volumes:
-    - name: dockersock
-      hostPath:
-        path: /var/run/docker.sock
-        type: Socket
-    - name: jenkins-cache
-      persistentVolumeClaim:
-        claimName: jenkins-cache
-    - name: workspace-volume
-      emptyDir: {}
+  - name: dockersock
+    hostPath:
+      path: /var/run/docker.sock
+  - name: jenkins-cache
+    persistentVolumeClaim:
+      claimName: jenkins-cache
+  - name: workspace-volume
+    emptyDir: {}
   nodeSelector:
     instancePurpose: deployment
   restartPolicy: Never
