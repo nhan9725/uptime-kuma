@@ -49,6 +49,7 @@ spec:
     - name: dockersock
       hostPath:
         path: /var/run/docker.sock
+        type: Socket
     - name: jenkins-cache
       persistentVolumeClaim:
         claimName: jenkins-cache
