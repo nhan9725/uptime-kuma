@@ -17,8 +17,8 @@ spec:
       readOnlyRootFilesystem: false
       allowPrivilegeEscalation: false
     volumeMounts:
-    - mountPath: /home/jenkins/
-      name: jenkins-cache
+    - name: node-modules-cache
+      mountPath: /app/node_modules
     - mountPath: /home/jenkins/agent
       name: workspace-volume
   - name: jnlp
@@ -28,30 +28,32 @@ spec:
       name: workspace-volume
       readOnly: false
   - name: docker
-    image: docker:19.03.12-dind
+    image: docker:20.10.7-dind
+    command:
+      - dockerd
+      - "--host=tcp://0.0.0.0:2375"
+      - "--host=unix:///var/run/docker.sock"
+      - "--storage-driver=overlay2"
     securityContext:
       privileged: true
     env:
-    - name: DOCKER_TLS_CERTDIR
-      value: ""
+      - name: DOCKER_BUILDKIT
+        value: "1"
     volumeMounts:
-    - name: docker-graph-storage
-      mountPath: /var/lib/docker
-    - name: docker-sock
-      mountPath: /var/run/docker.sock
+      - name: dockersock
+        mountPath: /var/run/docker.sock
+      - name: node-modules-cache
+        mountPath: /app/node_modules
 
+  volumes:
+    - name: dockersock
+      hostPath:
+        path: /var/run/docker.sock
+    - name: node-modules-cache
+      persistentVolumeClaim:
+        claimName: node-modules-cache
+    - name: workspace-volume
+      emptyDir: {}
   nodeSelector:
     instancePurpose: deployment
   restartPolicy: Never
-  volumes:
-  - name: jenkins-cache
-    persistentVolumeClaim:
-      claimName: jenkins-cache
-  - emptyDir:
-      medium: ""
-    name: workspace-volume
-  - name: docker-sock
-    hostPath:
-      path: /var/run/docker.sock
-  - name: docker-graph-storage
-    emptyDir: {}
