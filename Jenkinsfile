@@ -153,7 +153,7 @@ pipeline {
                 container('nextjs') {
                     script {
                         withCredentials([aws(credentialsId: 'ecr-test', region: "${REGION}")]) {
-                            sh "aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${ECR_ID}.dkr.ecr.${REGION}.amazonaws.com"                       
+                            sh "aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${ECR_ID}.dkr.ecr.${REGION}.amazonaws.com"   
                             sh "docker build -t ${PROJECT}:${JOB_NAME}-${BUILD_NUMBER} . -f docker/dockerfile "
                             sh "docker tag ${PROJECT}:${JOB_NAME}-${BUILD_NUMBER} ${ECR_ID}.dkr.ecr.${REGION}.amazonaws.com/${PROJECT}:${JOB_NAME}-${BUILD_NUMBER}"
                             sh "docker push ${ECR_ID}.dkr.ecr.${REGION}.amazonaws.com/${PROJECT}:${JOB_NAME}-${BUILD_NUMBER}"
