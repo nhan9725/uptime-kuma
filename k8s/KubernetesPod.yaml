@@ -56,5 +56,5 @@ spec:
     hostPath:
       path: /var/run/docker.sock
   nodeSelector:
-    kubernetes.io/os: reindex
+    kubernetes.io/os: development
   restartPolicy: Never 
