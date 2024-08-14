@@ -28,6 +28,13 @@ spec:
     volumeMounts:
     - name: docker-graph-storage
       mountPath: /var/lib/docker
+  - name: docker
+    image: docker:19.03.12-dind
+    securityContext:
+      privileged: true
+    volumeMounts:
+    - name: docker-graph-storage
+      mountPath: /var/lib/docker
   volumes:
   - name: docker-graph-storage
     emptyDir: {}
