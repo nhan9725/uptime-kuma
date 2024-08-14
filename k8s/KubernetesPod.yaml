@@ -19,15 +19,20 @@ spec:
     - name: DOCKER_HOST
       value: "tcp://localhost:2375"
   - name: nextjs
-    image: public.ecr.aws/n3g1a9g4/custom-image:test-docker-1408-07
+    image: public.ecr.aws/n3g1a9g4/custom-image:test-docker-1408-08
     securityContext:
       privileged: true  # Necessary for Docker-in-Docker to work
     env:
     - name: DOCKER_TLS_CERTDIR
       value: ""
+    command: ["tail", "-f", "/dev/null"]  # Keeps the container running for interaction
     volumeMounts:
     - name: workspace-volume
       mountPath: /workspace
+    - name: docker-socket-volume
+      mountPath: /var/run/docker.sock
+    - name: docker-graph-storage
+      mountPath: /var/lib/docker
   # - name: docker
   #   image: docker:19.03.12-dind
   #   securityContext:
@@ -40,6 +45,9 @@ spec:
     emptyDir: {}
   - name: workspace-volume
     emptyDir: {}
+  - name: docker-socket-volume
+    hostPath:
+      path: /var/run/docker.sock
   #nodeSelector:
   #  kubernetes.io/os: reindex
   #restartPolicy: Never 
