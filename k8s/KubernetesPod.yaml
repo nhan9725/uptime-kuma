@@ -58,3 +58,12 @@ spec:
   #nodeSelector:
     #kubernetes.io/os: development
   #restartPolicy: Never 
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: instancePurpose
+            operator: In
+            values:
+            - deployment  
