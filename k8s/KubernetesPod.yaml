@@ -7,53 +7,29 @@ spec:
   securityContext:
     fsGroup: 1000  # Add this to ensure the group has the correct permissions
   containers:
-  - name: nextjs
-    image: public.ecr.aws/n3g1a9g4/custom-image:test-docker-7
-    command: ["sh", "-c", "cat"]
-    tty: true
-    securityContext:
-      runAsUser: 1000
-      runAsGroup: 1000
-      readOnlyRootFilesystem: false
-      allowPrivilegeEscalation: false
-    volumeMounts:
-    - name: jenkins-cache
-      mountPath: /app/node_modules
-    - mountPath: /home/jenkins/agent
-      name: workspace-volume
   - name: jnlp
     image: "jenkins/inbound-agent:3248.v65ecb_254c298-2"
     volumeMounts:
     - mountPath: /home/jenkins/agent
       name: workspace-volume
       readOnly: false
-  - name: docker
-    image: docker:20.10.7-dind
-    command:
-      - dockerd
-      - "--host=tcp://0.0.0.0:2375"
-      - "--host=unix:///var/run/docker.sock"
-      - "--storage-driver=overlay2"
-    securityContext:
-      privileged: true
+    - name: docker-graph-storage
+      mountPath: /var/lib/docker         
     env:
-      - name: DOCKER_BUILDKIT
-        value: "1"
+    - name: DOCKER_HOST
+      value: "tcp://localhost:2375"
+  - name: jenkins-agent
+    image: docker:19.03.12-dind
+    securityContext:
+      privileged: true  # Necessary for Docker-in-Docker to work
+    env:
+    - name: DOCKER_TLS_CERTDIR
+      value: ""
     volumeMounts:
-    - name: dockersock
-      mountPath: /var/run/docker.sock
-    - name: jenkins-cache
-      mountPath: /app/node_modules
-
+    - name: docker-graph-storage
+      mountPath: /var/lib/docker
   volumes:
-  - name: dockersock
-    hostPath:
-      path: /var/run/docker.sock
-  - name: jenkins-cache
-    persistentVolumeClaim:
-      claimName: jenkins-cache
+  - name: docker-graph-storage
+    emptyDir: {}
   - name: workspace-volume
     emptyDir: {}
-  nodeSelector:
-    instancePurpose: deployment
-  restartPolicy: Never
