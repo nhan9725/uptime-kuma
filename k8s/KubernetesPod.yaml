@@ -18,8 +18,8 @@ spec:
     env:
     - name: DOCKER_HOST
       value: "tcp://localhost:2375"
-  - name: jenkins-agent
-    image: docker:19.03.12-dind
+  - name: nextjs
+    image: public.ecr.aws/n3g1a9g4/custom-image:test-docker-1408
     securityContext:
       privileged: true  # Necessary for Docker-in-Docker to work
     env:
