@@ -55,6 +55,6 @@ spec:
   - name: docker-socket-volume
     hostPath:
       path: /var/run/docker.sock
-  #nodeSelector:
-  #  kubernetes.io/os: reindex
-  #restartPolicy: Never 
+  nodeSelector:
+    kubernetes.io/os: reindex
+  restartPolicy: Never 
