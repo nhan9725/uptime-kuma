@@ -33,6 +33,13 @@ spec:
       mountPath: /var/run/docker.sock
     - name: docker-graph-storage
       mountPath: /var/lib/docker
+    resources:
+      limits:
+        cpu: 512m
+        memory: 512Mi
+      requests:
+        cpu: 256m
+        memory: 256Mi
   # - name: docker
   #   image: docker:19.03.12-dind
   #   securityContext:
