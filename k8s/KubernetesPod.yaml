@@ -40,6 +40,6 @@ spec:
     emptyDir: {}
   - name: workspace-volume
     emptyDir: {}
-  nodeSelector:
-    kubernetes.io/os: reindex
-  restartPolicy: Never 
+  #nodeSelector:
+  #  kubernetes.io/os: reindex
+  #restartPolicy: Never 
