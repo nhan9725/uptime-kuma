@@ -14,6 +14,7 @@ pipeline {
         PROJECT = 'nextjs'
         REGION = 'me-south-1'
         ECR_ID = '082568704422'
+        BRANCH_NAME = "${env.BRANCH_NAME ?: 'dev'}" // Default to 'dev' if BRANCH_NAME is not set
     }
 
     stages {
@@ -129,7 +130,8 @@ pipeline {
                                 -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
                                 -Dsonar.sources=. \
                                 -Dsonar.host.url=https://sonarcloud.io \
-                                -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info 
+                                -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+                                -Dsonar.branch.name=${BRANCH_NAME}
                             """
                         }
                     }
@@ -148,7 +150,7 @@ pipeline {
         }
         stage('Build and push docker image') {
             steps {
-                container('docker') {
+                container('nextjs') {
                     script {
                         withCredentials([aws(credentialsId: 'ecr-test', region: "${REGION}")]) {
                             sh "aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${ECR_ID}.dkr.ecr.${REGION}.amazonaws.com"                       
