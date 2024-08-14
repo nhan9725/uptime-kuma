@@ -40,3 +40,6 @@ spec:
     emptyDir: {}
   - name: workspace-volume
     emptyDir: {}
+  nodeSelector:
+    kubernetes.io/os: deployment
+  restartPolicy: Never 
