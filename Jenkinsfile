@@ -11,6 +11,7 @@ pipeline {
         SONAR_PROJECT_KEY = 'test-3107' // Your Sonar project key
         CACHE_KEY = '' // To store the checksum of package.json
         CACHE_DIR = '/home/jenkins/agent/workspace/cache-fe' // Cache directory on the Jenkins agent
+        YARN_CACHE_FOLDER = '/usr/local/share/.cache'
         PROJECT = 'nextjs'
         REGION = 'me-south-1'
         ECR_ID = '082568704422'
@@ -65,7 +66,7 @@ pipeline {
                 container('nextjs') {
                     script {
                         // Install dependencies using Yarn
-                        sh 'yarn install'  // mount cache folder on PVC , 1- it will cache dependencies on  /usr/local/share/.cache/yarn/ folder ; 2- try remove cache and run job again
+                        sh 'yarn install --frozen-lockfile --cache-folder $YARN_CACHE_FOLDER'  // mount cache folder on PVC , 1- it will cache dependencies on  /usr/local/share/.cache/yarn/ folder ; 2- try remove cache and run job again
                         sh 'yarn build'
                         sh 'yarn cache dir'
                     }

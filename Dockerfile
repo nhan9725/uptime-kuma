@@ -7,8 +7,14 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # Copy only package.json and yarn.lock to utilize Docker cache for dependencies installation
-COPY package.json yarn.lock ./
-
+#COPY package.json yarn.lock ./
+COPY package.json yarn.lock package-lock.json* pnpm-lock.yaml* ./
+RUN \
+  if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
+  elif [ -f package-lock.json ]; then npm ci; \
+  elif [ -f pnpm-lock.yaml ]; then yarn global add pnpm && pnpm i; \
+  else echo "Lockfile not found." && exit 1; \
+  fi
 # Install dependencies using Yarn
 RUN yarn install --frozen-lockfile
 
