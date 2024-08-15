@@ -18,50 +18,62 @@ pipeline {
     }
 
     stages {
-        stage ('Check for existence of index.html') {
+        // stage ('Check for existence of index.html') {
+        //     steps {
+        //         container('nextjs') {
+        //             script {
+        //                 if (fileExists('/home/jenkins/agent/workspace/cache-fe/dependencies-9e80c5051af62a08fc2b6cc2b5f90e02.tar')) {
+        //                     echo "File dependencies-9e80c5051af62a08fc2b6cc2b5f90e02.tar found!"
+        //                 } else {
+        //                     echo "No file found"
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
+
+        // stage('Cache Calculate Checksum if Installed Dependencies') {
+        //     steps {
+        //         container('nextjs') {
+        //             script {
+        //                 // Calculate the checksum for package.json
+        //                 env.CACHE_KEY = sh(
+        //                     script: 'md5sum package.json | awk \'{ print $1 }\'',
+        //                     returnStdout: true
+        //                 ).trim()
+        //                 echo "Calculated Checksum: ${env.CACHE_KEY}"
+
+        //                 // Define the path to the cache file
+        //                 def cachePath = "${env.CACHE_DIR}/dependencies-${env.CACHE_KEY}.tar"
+
+        //                 // Check if the cache file exists
+        //                 def cacheHit = fileExists(cachePath)
+        //                 if (cacheHit) {
+        //                     echo "Cache hit, extracting dependencies..."
+        //                     sh "tar -xf ${cachePath}"
+        //                 } else {
+        //                     echo "Cache miss, running yarn install..."
+        //                     sh 'yarn install'
+        //                     sh "mkdir -p ${env.CACHE_DIR} && tar -cf ${cachePath} node_modules"
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
+        stage('Unit Test ') {
             steps {
                 container('nextjs') {
                     script {
-                        if (fileExists('/home/jenkins/agent/workspace/cache-fe/dependencies-9e80c5051af62a08fc2b6cc2b5f90e02.tar')) {
-                            echo "File dependencies-9e80c5051af62a08fc2b6cc2b5f90e02.tar found!"
-                        } else {
-                            echo "No file found"
-                        }
+                        // Install dependencies using Yarn
+                        sh 'yarn install'  // mount cache folder on PVC , 1- it will cache dependencies on  /usr/local/share/.cache/yarn/ folder ; 2- try remove cache and run job again
+                        sh 'yarn build'
+                        sh 'yarn cache dir'
                     }
                 }
             }
         }
 
-        stage('Cache Calculate Checksum if Installed Dependencies') {
-            steps {
-                container('nextjs') {
-                    script {
-                        // Calculate the checksum for package.json
-                        env.CACHE_KEY = sh(
-                            script: 'md5sum package.json | awk \'{ print $1 }\'',
-                            returnStdout: true
-                        ).trim()
-                        echo "Calculated Checksum: ${env.CACHE_KEY}"
-
-                        // Define the path to the cache file
-                        def cachePath = "${env.CACHE_DIR}/dependencies-${env.CACHE_KEY}.tar"
-
-                        // Check if the cache file exists
-                        def cacheHit = fileExists(cachePath)
-                        if (cacheHit) {
-                            echo "Cache hit, extracting dependencies..."
-                            sh "tar -xf ${cachePath}"
-                        } else {
-                            echo "Cache miss, running yarn install..."
-                            sh 'yarn install'
-                            sh "mkdir -p ${env.CACHE_DIR} && tar -cf ${cachePath} node_modules"
-                        }
-                    }
-                }
-            }
-        }
-
-        stage('Unit Test and Coverage') {
+        stage('Coverage') {
             steps {
                 container('nextjs') {
                     script {
@@ -105,18 +117,6 @@ pipeline {
             }
         }
 
-        stage('Unit Install and Build') {
-            steps {
-                container('nextjs') {
-                    script {
-                        // Install dependencies using Yarn
-                        sh 'yarn install'
-                        sh 'yarn build'
-                        sh 'yarn cache dir'
-                    }
-                }
-            }
-        }
 
         stage('SonarQube analysis') {
             steps {
