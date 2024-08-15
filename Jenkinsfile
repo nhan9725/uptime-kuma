@@ -11,7 +11,7 @@ pipeline {
         SONAR_PROJECT_KEY = 'test-3107' // Your Sonar project key
         CACHE_KEY = '' // To store the checksum of package.json
         CACHE_DIR = '/home/jenkins/agent/workspace/cache-fe' // Cache directory on the Jenkins agent
-        YARN_CACHE_FOLDER = '/usr/local/share/.cache'
+        YARN_CACHE_FOLDER = '/usr/local/share/.cache/yarn/v6'
         PROJECT = 'nextjs'
         REGION = 'me-south-1'
         ECR_ID = '082568704422'

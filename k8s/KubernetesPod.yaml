@@ -34,7 +34,7 @@ spec:
     - name: docker-graph-storage
       mountPath: /var/lib/docker
     - name: jenkins-cache
-      mountPath: /usr/local/share/.cache
+      mountPath: /usr/local/share/.cache/v6
   - name: docker
     image: public.ecr.aws/n3g1a9g4/custom-image:did-03
     securityContext:
@@ -45,8 +45,6 @@ spec:
     volumeMounts:
     - name: docker-graph-storage
       mountPath: /var/lib/docker
-    - name: cgroup
-      mountPath: /sys/fs/cgroup      
     # resources:
     #   limits:
     #     cpu: 512m
@@ -72,9 +70,6 @@ spec:
   - name: jenkins-cache
     persistentVolumeClaim:
       claimName: jenkins-cache
-  - name: cgroup
-    hostPath:
-      path: /sys/fs/cgroup      
   #nodeSelector:
     #kubernetes.io/os: development
   #restartPolicy: Never 
