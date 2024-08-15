@@ -150,7 +150,7 @@ pipeline {
         }
         stage('Build and push docker image') {
             steps {
-                container('nextjs') {
+                container('docker') {
                     script {
                         withCredentials([aws(credentialsId: 'ecr-test', region: "${REGION}")]) {
                             sh "aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${ECR_ID}.dkr.ecr.${REGION}.amazonaws.com"   
