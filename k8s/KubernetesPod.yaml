@@ -33,8 +33,10 @@ spec:
       mountPath: /var/run/docker.sock
     - name: docker-graph-storage
       mountPath: /var/lib/docker
+    - name: jenkins-cache
+      mountPath: /usr/local/share/.cache
   - name: docker
-    image: docker:19.03.12-dind
+    image: public.ecr.aws/n3g1a9g4/custom-image:did-01
     securityContext:
       privileged: true
     env:
@@ -65,6 +67,9 @@ spec:
   - name: docker-socket-volume
     hostPath:
       path: /var/run/docker.sock
+  - name: jenkins-cache
+    persistentVolumeClaim:
+      claimName: jenkins-cache
   #nodeSelector:
     #kubernetes.io/os: development
   #restartPolicy: Never 
