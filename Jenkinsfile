@@ -66,9 +66,11 @@ pipeline {
                 container('nextjs') {
                     script {
                         // Install dependencies using Yarn
+                        // Set Yarn cache directory to the mounted PVC volume
+                        sh 'yarn config set cache-folder $YARN_CACHE_FOLDER'
+                        sh 'yarn cache dir'
                         sh 'yarn install --frozen-lockfile --cache-folder $YARN_CACHE_FOLDER'  // mount cache folder on PVC , 1- it will cache dependencies on  /usr/local/share/.cache/yarn/ folder ; 2- try remove cache and run job again
                         sh 'yarn build'
-                        sh 'yarn cache dir'
                     }
                 }
             }
