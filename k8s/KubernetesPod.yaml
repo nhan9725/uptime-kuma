@@ -34,7 +34,7 @@ spec:
     - name: docker-graph-storage
       mountPath: /var/lib/docker
     - name: jenkins-cache
-      mountPath: /usr/local/share/.cache/v6
+      mountPath: /usr/local/share/.cache
   - name: docker
     image: public.ecr.aws/n3g1a9g4/custom-image:did-03
     securityContext:
