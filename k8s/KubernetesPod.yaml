@@ -45,6 +45,8 @@ spec:
     volumeMounts:
     - name: docker-graph-storage
       mountPath: /var/lib/docker
+    - name: cgroup
+      mountPath: /sys/fs/cgroup      
     # resources:
     #   limits:
     #     cpu: 512m
@@ -70,6 +72,9 @@ spec:
   - name: jenkins-cache
     persistentVolumeClaim:
       claimName: jenkins-cache
+  - name: cgroup
+    hostPath:
+      path: /sys/fs/cgroup      
   #nodeSelector:
     #kubernetes.io/os: development
   #restartPolicy: Never 
