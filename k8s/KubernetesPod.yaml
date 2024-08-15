@@ -19,7 +19,7 @@ spec:
     - name: DOCKER_HOST
       value: "tcp://localhost:2375"
   - name: nextjs
-    image: public.ecr.aws/n3g1a9g4/custom-image:test-docker-1408-09
+    image: public.ecr.aws/n3g1a9g4/custom-image:test-dockerv5   #bk:test-docker-1408-09
     securityContext:
       privileged: true  # Necessary for Docker-in-Docker to work
     env:
