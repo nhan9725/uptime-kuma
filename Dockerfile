@@ -33,7 +33,8 @@ FROM node:18.15-alpine AS builder
 # Copy the rest of the application code to the working directory
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY /app /app
+COPY config ./app
+COPY . ./app
 COPY . .
 # Build the application if necessary (optional)
 RUN yarn build
