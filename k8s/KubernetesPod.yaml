@@ -36,7 +36,7 @@ spec:
     - name: jenkins-cache
       mountPath: /usr/local/share/.cache
   - name: docker
-    image: public.ecr.aws/n3g1a9g4/custom-image:did-03
+    image: public.ecr.aws/n3g1a9g4/custom-image:did-05
     securityContext:
       privileged: true
     env:
