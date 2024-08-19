@@ -166,15 +166,12 @@ pipeline {
             }
         }
 
-        stage('Tag Version') {
+        stage('Snyk Scan Vulnerabilities') {
             steps {
-                container('nextjs') {
+                container('docker') {
                     script {
-                        def version = readFile('VERSION').trim() // Ensure VERSION file is read correctly
-                        sh "git config user.name 'jenkins'"
-                        sh "git config user.email 'jenkins@your-domain.com'"
-                        sh "git tag -a ${version} -m 'Release ${version}'"
-                        sh "git push origin ${version}"
+                           // sh ''
+                            sh 'snyk container test ${ECR_ID}.dkr.ecr.${REGION}.amazonaws.com/${PROJECT}:${JOB_NAME}-${BUILD_NUMBER}'
                     }
                 }
             }
