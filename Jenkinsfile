@@ -171,23 +171,44 @@ pipeline {
                 container('docker') {
                     script {
                            // sh ''
-                            sh 'snyk container test ${ECR_ID}.dkr.ecr.${REGION}.amazonaws.com/${PROJECT}:${JOB_NAME}-${BUILD_NUMBER}'
+                        sh 'snyk container test ${ECR_ID}.dkr.ecr.${REGION}.amazonaws.com/${PROJECT}:${JOB_NAME}-${BUILD_NUMBER} --file=./Dockerfile' //scan both base_image
+                        sh 'snyk container monitor ${ECR_ID}.dkr.ecr.${REGION}.amazonaws.com/${PROJECT}:${JOB_NAME}-${BUILD_NUMBER} --file=./Dockerfile' //push to snyk cloud 
                     }
                 }
             }
         }
-    }
-
-    post {
-        always {
-            junit 'reports/**/*.xml' // Adjust to your test report location
-            archiveArtifacts artifacts: '**/coverage/**', allowEmptyArchive: true
-            script {
-                // Wait for SonarQube analysis to be completed
-                timeout(time: 1, unit: 'HOURS') {
-                    waitForQualityGate abortPipeline: true
+        stage ('Approve deployment Application') {
+            steps {
+                container('nextjs') {
+                    script {
+                        input message: 'Proceed to SonarQube analysis?', ok: 'Yes'
+                    }
                 }
             }
         }
-    }
+
+        stage ('Notification deployment') {
+            steps {
+                container('nextjs') {
+                    script {
+                        echo "Deployment to production is successful"
+                    }
+                }
+            }
+        }
+
+}
+
+//    post {
+//         always {
+//             junit 'reports/**/*.xml' // Adjust to your test report location
+//             archiveArtifacts artifacts: '**/coverage/**', allowEmptyArchive: true
+//             script {
+//                 // Wait for SonarQube analysis to be completed
+//                 timeout(time: 1, unit: 'HOURS') {
+//                     waitForQualityGate abortPipeline: true
+//                 }
+//             }
+//         }
+//     }  
 }
