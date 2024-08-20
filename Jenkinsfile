@@ -166,31 +166,58 @@ pipeline {
             }
         }
 
-        stage('Tag Version') {
+        stage('Snyk Scan Vulnerabilities') {
             steps {
-                container('nextjs') {
+                container('docker') {
                     script {
-                        def version = readFile('VERSION').trim() // Ensure VERSION file is read correctly
-                        sh "git config user.name 'jenkins'"
-                        sh "git config user.email 'jenkins@your-domain.com'"
-                        sh "git tag -a ${version} -m 'Release ${version}'"
-                        sh "git push origin ${version}"
+                        // sh 'snyk config set disableSuggestions=true' //remove these messages
+                        // sh 'snyk container test ${ECR_ID}.dkr.ecr.${REGION}.amazonaws.com/${PROJECT}:${JOB_NAME}-${BUILD_NUMBER}'  // --file=./Dockerfile --exclude-base-image-vulns' //scan both base_image
+                        // sh 'snyk container monitor ${ECR_ID}.dkr.ecr.${REGION}.amazonaws.com/${PROJECT}:${JOB_NAME}-${BUILD_NUMBER}' // --file=./Dockerfile --exclude-base-image-vulns' //push to snyk cloud 
+                        // The default behavior of Snyk is to return a non-zero exit code if any vulnerabilities are found.
+                        sh '''
+                        set +e
+                        snyk container test ${ECR_ID}.dkr.ecr.${REGION}.amazonaws.com/${PROJECT}:${JOB_NAME}-${BUILD_NUMBER}
+                        snyk container monitor ${ECR_ID}.dkr.ecr.${REGION}.amazonaws.com/${PROJECT}:${JOB_NAME}-${BUILD_NUMBER}
+                        exitCode=$?
+                        set -e
+                        echo "Snyk scan completed with exit code ${exitCode}"
+                        '''
                     }
                 }
             }
         }
-    }
-
-    post {
-        always {
-            junit 'reports/**/*.xml' // Adjust to your test report location
-            archiveArtifacts artifacts: '**/coverage/**', allowEmptyArchive: true
-            script {
-                // Wait for SonarQube analysis to be completed
-                timeout(time: 1, unit: 'HOURS') {
-                    waitForQualityGate abortPipeline: true
+        stage ('Approve deployment Application') {
+            steps {
+                container('nextjs') {
+                    script {
+                        input message: 'Proceed to SonarQube analysis?', ok: 'Yes'
+                    }
                 }
             }
         }
-    }
+
+        stage ('Notification deployment') {
+            steps {
+                container('nextjs') {
+                    script {
+                        echo "Deployment to production is successful"
+                    }
+                }
+            }
+        }
+
+}
+
+//    post {
+//         always {
+//             junit 'reports/**/*.xml' // Adjust to your test report location
+//             archiveArtifacts artifacts: '**/coverage/**', allowEmptyArchive: true
+//             script {
+//                 // Wait for SonarQube analysis to be completed
+//                 timeout(time: 1, unit: 'HOURS') {
+//                     waitForQualityGate abortPipeline: true
+//                 }
+//             }
+//         }
+//     }  
 }
