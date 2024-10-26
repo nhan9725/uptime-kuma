@@ -16,6 +16,9 @@ pipeline {
         REGION = 'me-south-1'
         ECR_ID = '082568704422'
         BRANCH_NAME = "${env.BRANCH_NAME ?: 'dev'}" // Default to 'dev' if BRANCH_NAME is not set
+        GIT_REPO_URL = 'https://github.com/nhan9725/uptime-kuma.git'
+        K8S_MANIFEST_FILE = 'app.yaml'
+        IMAGE_TAG = "${JOB_NAME}-${BUILD_NUMBER}"
     }
 
     stages {
@@ -190,12 +193,39 @@ pipeline {
             steps {
                 container('nextjs') {
                     script {
-                        input message: 'Proceed to SonarQube analysis?', ok: 'Yes'
+                        input message: 'Approve deployment Application', ok: 'Yes'
                     }
                 }
             }
         }
 
+        stage('Update GitHub Repository') {
+                    steps {
+                        container('nextjs') {
+                            script {
+                            // Clone repository
+                            sh """
+                            git clone -b ${BRANCH_NAME} ${GIT_REPO_URL}
+                            cd k8s
+                            """
+
+                            // Update file manifest YAML với tag mới
+                            sh """
+                            sed -i 's|image: ${ECR_ID}.dkr.ecr.${REGION}.amazonaws.com/${PROJECT}:.*|image: ${ECR_ID}.dkr.ecr.${REGION}.amazonaws.com/${PROJECT}:${IMAGE_TAG}|' ${K8S_MANIFEST_FILE}
+                            """
+
+                            // Commit và push thay đổi
+                            sh """
+                            git config user.name "jenkins-bot"
+                            git config user.email "jenkins-bot@example.com"
+                            git add ${K8S_MANIFEST_FILE}
+                            git commit -m "Update image to ${IMAGE_TAG}"
+                            git push origin ${BRANCH_NAME}
+                            """
+                            }
+                        }
+                    }
+                }
         stage ('Notification deployment') {
             steps {
                 container('nextjs') {
@@ -205,6 +235,20 @@ pipeline {
                 }
             }
         }
+
+        stage('Trigger Argo CD Sync to Deployment') {
+            steps {
+                container('nextjs') {
+                    script {
+                    // Trigger Argo CD sync bằng webhook hoặc CLI
+                    sh """
+                    argocd app sync app-test --auth-token ARGOCD_AUTH_TOKEN --server test-argo.9ten.online
+                    """
+                    // Hoặc, bạn có thể gọi một webhook nếu Argo CD có tích hợp webhook Git
+                    }
+                }
+            }
+        }        
 
 }
 
