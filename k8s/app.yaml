@@ -94,7 +94,7 @@ spec:
     spec:
       containers:
       - name: nodejs-app
-        image: 082568704422.dkr.ecr.me-south-1.amazonaws.com/nextjs:test-1908-01
+        image: 082568704422.dkr.ecr.me-south-1.amazonaws.com/nextjs:test
         ports:
         - containerPort: 3001
         env:
